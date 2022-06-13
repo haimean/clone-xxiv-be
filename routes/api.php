@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\UserAuthController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,31 +21,36 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::prefix('products')->controller(ProductController::class)->group(function () {
+    Route::middleware('auth:admin_api')->group(function () {
+        Route::post('/', 'store');
+        Route::post('update/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
 
-
-/*------------------------------------------
---------------------------------------------
-All Normal Users Routes List
---------------------------------------------
---------------------------------------------*/
-Route::middleware(['auth', 'user-access:user'])->group(function () {
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::middleware('auth:user_api')->group(function () {
+        Route::get('/', 'getAllProduct');
+        Route::get('/{id}', 'show');
+    });
 });
 
-/*------------------------------------------
---------------------------------------------
-All Admin Routes List
---------------------------------------------
---------------------------------------------*/
-Route::middleware(['auth', 'user-access:admin'])->group(function () {
-    Route::get('/admin/home', [HomeController::class, 'adminHome'])->name('admin.home');
+
+Route::prefix('admin')->controller(AdminAuthController::class)->group(function () {
+
+    Route::post('login', 'login');
+    Route::post('register', 'register');
+    Route::middleware('auth:admin_api')->group(function () {
+        Route::post('logout', 'logout');
+        Route::post('me', 'me');
+    });
 });
 
-/*------------------------------------------
---------------------------------------------
-All Admin Routes List
---------------------------------------------
---------------------------------------------*/
-Route::middleware(['auth', 'user-access:manager'])->group(function () {
-    Route::get('/manager/home', [HomeController::class, 'managerHome'])->name('manager.home');
+Route::prefix('user')->controller(UserAuthController::class)->group(function () {
+
+    Route::post('login', 'login');
+    Route::post('register', 'register');
+    Route::middleware('auth:admin_api')->group(function () {
+        Route::post('logout', 'logout');
+        Route::post('me', 'me');
+    });
 });
