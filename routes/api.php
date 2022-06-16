@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\BrandsController;
+use App\Http\Controllers\FragranceController;
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
@@ -45,6 +46,14 @@ Route::prefix('admin')->controller(AdminAuthController::class)->group(function (
         Route::get('me', 'me');
         Route::prefix('brand')->controller(BrandsController::class)->group(function () {
             Route::get('get-brands', 'getAllBrand');
+            Route::post('store', 'store');
+            Route::post('create', 'create');
+            Route::get('/{id}', 'show');
+            Route::post('update', 'update');
+            Route::delete('/{id}', 'delete');
+        });
+        Route::prefix('fragrance')->controller(FragranceController::class)->group(function () {
+            Route::get('get-all', 'getAll');
             Route::post('store', 'store');
             Route::post('create', 'create');
             Route::get('/{id}', 'show');
