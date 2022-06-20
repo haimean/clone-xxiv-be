@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\BrandsController;
+use App\Http\Controllers\CapacityController;
 use App\Http\Controllers\FragranceController;
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\ProductController;
@@ -57,6 +58,12 @@ Route::prefix('admin')->controller(AdminAuthController::class)->group(function (
             Route::post('store', 'store');
             Route::post('create', 'create');
             Route::get('/{id}', 'show');
+            Route::post('update', 'update');
+            Route::delete('/{id}', 'delete');
+        });
+        Route::prefix('capacity')->controller(CapacityController::class)->group(function () {
+            Route::get('get-all', 'getAll');
+            Route::post('create', 'create');
             Route::post('update', 'update');
             Route::delete('/{id}', 'delete');
         });
