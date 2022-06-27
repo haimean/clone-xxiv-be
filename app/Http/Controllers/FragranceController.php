@@ -30,14 +30,12 @@ class FragranceController extends Controller
     {
         $request->validate([
             'name' => ['string'],
-            'description' => ['string'],
         ]);
         try {
-            $brand = new Fragrance;            
-            $brand->description = $request->description;
-            $brand->name = $request->name;
-            $brand->image_uuid = $request->image_uuid;
-            $brand->save();
+            $fagrance = new Fragrance();            
+            $fagrance->name = $request->name;
+            $fagrance->image_uuid = $request->image_uuid;
+            $fagrance->save();
         } catch (QueryException $e) {
             return response()->json(["Something Went Wrong!", $e->getMessage(), 500]);
         }
@@ -64,11 +62,11 @@ class FragranceController extends Controller
         ]);
 
         try {
-            $brand = Fragrance::find($request->id);
-            $brand->description = $request->description;
-            $brand->name = $request->name;
-            $brand->image_uuid = $request->image_uuid;
-            $brand->save();
+            $fagrance = Fragrance::find($request->id);
+            $fagrance->description = $request->description;
+            $fagrance->name = $request->name;
+            $fagrance->image_uuid = $request->image_uuid;
+            $fagrance->save();
         } catch (QueryException $e) {
             return response()->json(["Something Went Wrong!", $e->getMessage(), 500]);
         }

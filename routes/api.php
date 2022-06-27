@@ -67,6 +67,13 @@ Route::prefix('admin')->controller(AdminAuthController::class)->group(function (
             Route::post('update', 'update');
             Route::delete('/{id}', 'delete');
         });
+        Route::prefix('product')->controller(ProductController::class)->group(function () {
+            Route::get('get-all', 'getAll');
+            Route::get('{id}', 'show');
+            Route::post('create', 'create');
+            Route::post('update', 'update');
+            Route::delete('/{id}', 'delete');
+        });
     });
 });
 
