@@ -44,6 +44,7 @@ Route::prefix('admin')->controller(AdminAuthController::class)->group(function (
     Route::post('register', 'register');
     Route::middleware('auth:admin_api')->group(function () {
         Route::post('logout', 'logout');
+        Route::post('refresh', 'refresh');
         Route::get('me', 'me');
         Route::prefix('brand')->controller(BrandsController::class)->group(function () {
             Route::get('get-brands', 'getAllBrand');

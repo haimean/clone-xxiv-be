@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
@@ -29,4 +28,29 @@ class Product extends Model
         'night',
         "published_at",
     ];
+    public function brand()
+    {
+        return $this->hasOne(Brands::class, 'id');
+    }
+    public function capacities()
+    {
+        return $this->belongsToMany(Capacity::class, 'map_porducts_capacity', 'product_id', 'capacity_id')->withPivot('quantity', 'price');
+    }
+
+    public function main_scent()
+    {
+        return $this->belongsToMany(Fragrance::class, 'map_main_scent');
+    }
+    public function top_scent()
+    {
+        return $this->belongsToMany(Fragrance::class, 'map_top_scent');
+    }
+    public function middle_scent()
+    {
+        return $this->belongsToMany(Fragrance::class, 'map_middle_scent');
+    }
+    public function last_scent()
+    {
+        return $this->belongsToMany(Fragrance::class, 'map_last_scent');
+    }
 }

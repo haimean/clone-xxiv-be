@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brands;
-use App\Models\Capacity;
-use App\Models\Fragrance;
 use App\Models\Product;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -20,10 +17,9 @@ class ProductController extends Controller
 
             foreach ($datas as $data) {
                 $data->quatity = 0;
-                $data->brand = Brands::find($data->brands_id)->value('name');
-                $capacity =   DB::table('map_porducts_capacity')->where('id', $data->id)->get();
-                foreach ($capacity as $value) {
-                    $data->quatity += $value->quantity;
+                $data->brand;
+                foreach ($data->capacities as $value) {
+                    $data->quatity += $value->pivot->quantity;
                 }
             }
             return response()->json($datas);
@@ -33,20 +29,13 @@ class ProductController extends Controller
     }
     public function show($id)
     {
-    
         try {
             $data = Product::find($id);
-            $data->quatity = 0;
-            $capacity =   DB::table('map_porducts_capacity')->where('product_id', $data->id)->get();
-            foreach ($capacity as $value) {
-                $value->name_capacity =  Capacity::where('id', $value->capacity_id)->value('name');
-                $data->quatity += $value->quantity;
-            }
-            $data->capacity = $capacity;
-            $data->main_scent = Fragrance::whereIn('id',DB::table('map_main_scent')->where('product_id', $data->id)->pluck('fragrance_id'))->get();
-            $data->top_scent = Fragrance::whereIn('id',DB::table('map_top_scent')->where('product_id', $data->id)->pluck('fragrance_id'))->get();
-            $data->middle_scent = Fragrance::whereIn('id',DB::table('map_middle_scent')->where('product_id', $data->id)->pluck('fragrance_id'))->get();
-            $data->last_scent = Fragrance::whereIn('id',DB::table('map_last_scent')->where('product_id', $data->id)->pluck('fragrance_id'))->get();
+            $data->capacities;
+            $data->main_scent;
+            $data->top_scent;
+            $data->middle_scent;
+            $data->last_scent;
             if ($data) {
                 return response()->json($data);
             } else {
@@ -56,27 +45,112 @@ class ProductController extends Controller
             return response()->json(["Something Went Wrong!", $e->getMessage(), 500]);
         }
     }
-    public function update($data = [], $id)
+    public function update(Request $request)
     {
-        // try {
-        //     $data = Product::find($id)->update($data);
-        //     return response($data, 'Data Updated Successfully!');
-        // } catch (QueryException $e) {
-        //     return response("Something Went Wrong!", $e->getMessage(), 500);
-        // }
+        try {
+            $product = Product::find($request->id);
+            $product->content = $request->content;
+            $product->brands_id = $request->brands_id;
+            $product->age = $request->age;
+            $product->day = $request->day;
+            $product->description = $request->description;
+            $product->fall = $request->fall;
+            $product->night = $request->night;
+            $product->sex = $request->sex;
+            $product->spring = $request->spring;
+            $product->summer = $request->summer;
+            $product->time_smell = $request->time_smell;
+            $product->title = $request->title;
+            $product->winter = $request->winter;
+            $product->published_at = $request->published_at;
+            $product->image_uuid = 'IMAGE';
+            $capacities = [];
+            foreach ($request->capacities as  $value) {
+                array_push($capacities, $value['id']);
+            }
+            $product->capacities()->sync($capacities);
+            foreach ($request->capacities as  $value) {
+                $product->capacities()->updateExistingPivot($value['id'], ['price' => $value['pivot']['price'], 'quantity' => $value['pivot']['quantity']]);
+            }
+            $main_scent = [];
+            $top_scent = [];
+            $middle_scent = [];
+            $last_scent = [];
+            foreach ($request->main_scent as  $value) {
+                array_push($main_scent, $value['id']);
+            }
+            foreach ($request->top_scent as  $value) {
+                array_push($top_scent, $value['id']);
+            }
+            foreach ($request->middle_scent as  $value) {
+                array_push($middle_scent, $value['id']);
+            }
+            foreach ($request->last_scent as  $value) {
+                array_push($last_scent, $value['id']);
+            }
+            $product->main_scent()->sync($main_scent);
+            $product->main_scent()->sync($top_scent);
+            $product->main_scent()->sync($middle_scent);
+            $product->main_scent()->sync($last_scent);
+            $product->save();
+            return response()->json('Update Successfully!', 200);
+        } catch (QueryException $e) {
+            return response()->json(["Something Went Wrong!", $e->getMessage()], 500);
+        }
+    }
+
+    public function create(Request $request)
+    {
+        try {
+            $product = new Product();
+            $product->content = $request->content;
+            $product->brands_id = $request->brands_id;
+            $product->age = $request->age;
+            $product->day = $request->day;
+            $product->description = $request->description;
+            $product->fall = $request->fall;
+            $product->night = $request->night;
+            $product->sex = $request->sex;
+            $product->spring = $request->spring;
+            $product->summer = $request->summer;
+            $product->time_smell = $request->time_smell;
+            $product->title = $request->title;
+            $product->winter = $request->winter;
+            $product->published_at = $request->published_at;
+            $product->image_uuid = 'IMAGE';
+            $product->save();
+            foreach ($request->capacities as  $value) {
+                $product->capacities()->attach($value['id'], ['product_id' => $product['id'], 'price' => $value['pivot']['price'], 'quantity' => $value['pivot']['quantity']]);
+            }
+            foreach ($request->main_scent as  $value) {
+                $product->main_scent()->attach($value['id']);
+            }
+            foreach ($request->top_scent as  $value) {
+                $product->top_scent()->attach($value['id']);
+            }
+            foreach ($request->last_scent as  $value) {
+                $product->last_scent()->attach($value['id']);
+            }
+            foreach ($request->middle_scent as  $value) {
+                $product->middle_scent()->attach($value['id']);
+            }
+            $product->save();
+            return response()->json('Create Successfully!', 200);
+        } catch (QueryException $e) {
+            return response()->json(["Something Went Wrong!", $e->getMessage()], 500);
+        }
     }
     public function delete($id)
     {
         try {
-            $Fragrance =  Product::find($id);
-
-            if ($Fragrance) {
+            $product =  Product::find($id);
+            if ($product) {
                 DB::table('map_porducts_capacity')->where('product_id', $id)->delete();
                 DB::table('map_main_scent')->where('product_id', $id)->delete();
                 DB::table('map_top_scent')->where('product_id', $id)->delete();
                 DB::table('map_middle_scent')->where('product_id', $id)->delete();
                 DB::table('map_last_scent')->where('product_id', $id)->delete();
-                $Fragrance->delete();
+                $product->delete();
                 return response()->json(['Data Deleted Successfully!', 200]);
             }
         } catch (QueryException $e) {
