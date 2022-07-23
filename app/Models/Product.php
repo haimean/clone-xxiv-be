@@ -16,7 +16,7 @@ class Product extends Model
         "tile",
         "content",
         "description",
-        "brand_id",
+        "brands_id",
         'time_smell',
         'sex',
         'age',
@@ -30,7 +30,7 @@ class Product extends Model
     ];
     public function brand()
     {
-        return $this->hasOne(Brands::class, 'id');
+        return $this->hasOne(Brands::class, "id", 'brands_id');
     }
     public function capacities()
     {

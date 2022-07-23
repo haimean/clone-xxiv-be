@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
 
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
 use App\Models\Capacity;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -23,7 +25,7 @@ class CapacityController extends Controller
             'name' => ['string'],
         ]);
         try {
-            $capacity = new Capacity();            
+            $capacity = new Capacity();
             $capacity->name = $request->name;
             $capacity->save();
             return response()->json(["Create Successfully!", 200]);

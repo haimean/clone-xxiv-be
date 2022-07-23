@@ -1,11 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class ProductController extends Controller
 {
@@ -16,6 +20,11 @@ class ProductController extends Controller
             $datas = Product::get();
 
             foreach ($datas as $data) {
+                if (Storage::url("images/product/$data->id/$data->image_uuid.png")) {
+                    $data->image = Storage::url("images/product/$data->id/$data->image_uuid.png");
+                }
+                // $data->image = Storage::url("images/product/1/f5210b76-022c-4ab9-aa3f-7de59f826367.png");
+
                 $data->quatity = 0;
                 $data->brand;
                 foreach ($data->capacities as $value) {
@@ -31,6 +40,12 @@ class ProductController extends Controller
     {
         try {
             $data = Product::find($id);
+            // if (Storage::url("images/product/$data->id/$data->image_uuid.png")) {
+            // $data->image
+            // = Storage::url("images/product/$data->id/$data->image_uuid.png");
+            // }
+            $data->image = Storage::url("images/product/1/f5210b76-022c-4ab9-aa3f-7de59f826367.png");
+
             $data->capacities;
             $data->main_scent;
             $data->top_scent;
@@ -63,8 +78,15 @@ class ProductController extends Controller
             $product->title = $request->title;
             $product->winter = $request->winter;
             $product->published_at = $request->published_at;
-            $product->image_uuid = 'IMAGE';
             $capacities = [];
+            $image = Image::make($request->image)->resize(512, 512)->encode('png');
+            $uuid = Str::uuid();
+            $oldUuid = $product->image_uuid;
+            Storage::disk('s3')->put("images/product/$product->id/$uuid.png", $image->stream());
+            $product->image_uuid = $uuid;
+            if ($oldUuid) {
+                Storage::disk('s3')->delete("images/product/$product->id/$oldUuid.png");
+            }
             foreach ($request->capacities as  $value) {
                 array_push($capacities, $value['id']);
             }
@@ -118,6 +140,14 @@ class ProductController extends Controller
             $product->winter = $request->winter;
             $product->published_at = $request->published_at;
             $product->image_uuid = 'IMAGE';
+            $image = Image::make($request->file('image'))->resize(256, 256)->encode('png');
+            $uuid = Str::uuid();
+            $oldUuid = $product->image_uuid;
+            Storage::put("images/product/$product->id/$uuid.png", $image->stream());
+            $product->image_uuid = $uuid;
+            if ($oldUuid) {
+                Storage::delete("images/product/$product->id/$oldUuid.png");
+            }
             $product->save();
             foreach ($request->capacities as  $value) {
                 $product->capacities()->attach($value['id'], ['product_id' => $product['id'], 'price' => $value['pivot']['price'], 'quantity' => $value['pivot']['quantity']]);
@@ -144,6 +174,10 @@ class ProductController extends Controller
     {
         try {
             $product =  Product::find($id);
+            $oldUuid = $product->image_uuid;
+            if ($oldUuid) {
+                Storage::disk('s3')->delete("images/product/$product->id/$oldUuid.png");
+            }
             if ($product) {
                 DB::table('map_porducts_capacity')->where('product_id', $id)->delete();
                 DB::table('map_main_scent')->where('product_id', $id)->delete();

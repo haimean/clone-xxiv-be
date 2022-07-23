@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
 
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
 use App\Models\Fragrance;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -32,7 +34,7 @@ class FragranceController extends Controller
             'name' => ['string'],
         ]);
         try {
-            $fagrance = new Fragrance();            
+            $fagrance = new Fragrance();
             $fagrance->name = $request->name;
             $fagrance->image_uuid = $request->image_uuid;
             $fagrance->save();

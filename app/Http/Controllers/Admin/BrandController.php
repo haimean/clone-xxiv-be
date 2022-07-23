@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
 
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
 use App\Models\Brands;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -34,7 +36,7 @@ class BrandsController extends Controller
             'description' => ['string'],
         ]);
         try {
-            $brand = new Brands;            
+            $brand = new Brands;
             $brand->description = $request->description;
             $brand->name = $request->name;
             $brand->image_uuid = $request->image_uuid;
