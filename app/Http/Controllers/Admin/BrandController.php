@@ -121,10 +121,10 @@ class BrandController extends Controller
                 $oldUuidBackground = $brand->background_uuid;
                 $oldUuidLogo = $brand->logo_uuid;
                 if ($oldUuidBackground) {
-                    Storage::disk('s3')->delete("images/product/$brand->id/$oldUuidBackground.png");
+                    Storage::disk('s3')->delete("images/brand/$brand->id/background/$oldUuidBackground.png");
                 }
                 if ($oldUuidLogo) {
-                    Storage::disk('s3')->delete("images/product/$brand->id/$oldUuidLogo.png");
+                    Storage::disk('s3')->delete("images/brand/$brand->id/background/$oldUuidLogo.png");
                 }
                 $brand->delete();
                 return response()->json(['Data Deleted Successfully!', 200]);
