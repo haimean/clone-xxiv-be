@@ -15,6 +15,6 @@ class Capacity extends Model
 
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'map_porducts_capacity');
+        return $this->belongsToMany(Product::class, 'map_products_capacity');
     }
 }

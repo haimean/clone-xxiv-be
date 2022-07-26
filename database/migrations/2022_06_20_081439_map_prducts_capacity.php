@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(Capacity::class);
             $table->foreignIdFor(Product::class);
             $table->integer('quantity')->default(0);
-            $table->float('price')->default(0);          
+            $table->float('price')->default(0);
             $table->timestamps();
         });
     }

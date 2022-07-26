@@ -17,21 +17,20 @@ class ProductController extends Controller
     public function getAll()
     {
         try {
-            $datas = Product::get();
+            $data = Product::get();
 
-            foreach ($datas as $data) {
-                if (Storage::url("images/product/$data->id/$data->image_uuid.png")) {
-                    $data->image = Storage::url("images/product/$data->id/$data->image_uuid.png");
+            foreach ($data as $datum) {
+                if (Storage::url("images/product/$datum->id/$datum->image_uuid.png")) {
+                    $datum->image = Storage::url("images/product/$datum->id/$datum->image_uuid.png");
                 }
                 // $data->image = Storage::url("images/product/1/f5210b76-022c-4ab9-aa3f-7de59f826367.png");
-
-                $data->quatity = 0;
-                $data->brand;
-                foreach ($data->capacities as $value) {
-                    $data->quatity += $value->pivot->quantity;
+                $datum->quantity = 0;
+                $datum->brand;
+                foreach ($datum->capacities as $value) {
+                    $datum->quantity += $value->pivot->quantity;
                 }
             }
-            return response()->json($datas);
+            return response()->json($data);
         } catch (QueryException $e) {
             return response()->json(["Something Went Wrong!", $e->getMessage(), 500]);
         }
@@ -40,12 +39,11 @@ class ProductController extends Controller
     {
         try {
             $data = Product::find($id);
-            // if (Storage::url("images/product/$data->id/$data->image_uuid.png")) {
-            // $data->image
-            // = Storage::url("images/product/$data->id/$data->image_uuid.png");
-            // }
-            $data->image = Storage::url("images/product/1/f5210b76-022c-4ab9-aa3f-7de59f826367.png");
-
+            if (Storage::url("images/product/$data->id/$data->image_uuid.png")) {
+                $data->image
+                    = Storage::url("images/product/$data->id/$data->image_uuid.png");
+            }
+            // $data->image = Storage::url("images/product/1/f5210b76-022c-4ab9-aa3f-7de59f826367.png");
             $data->capacities;
             $data->main_scent;
             $data->top_scent;
@@ -174,12 +172,13 @@ class ProductController extends Controller
     {
         try {
             $product =  Product::find($id);
-            $oldUuid = $product->image_uuid;
-            if ($oldUuid) {
-                Storage::disk('s3')->delete("images/product/$product->id/$oldUuid.png");
-            }
+
             if ($product) {
-                DB::table('map_porducts_capacity')->where('product_id', $id)->delete();
+                $oldUuid = $product->image_uuid;
+                if ($oldUuid) {
+                    Storage::disk('s3')->delete("images/product/$product->id/$oldUuid.png");
+                }
+                DB::table('map_products_capacity')->where('product_id', $id)->delete();
                 DB::table('map_main_scent')->where('product_id', $id)->delete();
                 DB::table('map_top_scent')->where('product_id', $id)->delete();
                 DB::table('map_middle_scent')->where('product_id', $id)->delete();

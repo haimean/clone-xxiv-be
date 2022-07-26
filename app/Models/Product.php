@@ -34,7 +34,7 @@ class Product extends Model
     }
     public function capacities()
     {
-        return $this->belongsToMany(Capacity::class, 'map_porducts_capacity', 'product_id', 'capacity_id')->withPivot('quantity', 'price');
+        return $this->belongsToMany(Capacity::class, 'map_products_capacity', 'product_id', 'capacity_id')->withPivot('quantity', 'price');
     }
 
     public function main_scent()
