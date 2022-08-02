@@ -52,6 +52,7 @@ return [
             'region' => 'us-east-1',
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
         ],
 
     ],

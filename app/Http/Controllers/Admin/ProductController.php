@@ -20,7 +20,7 @@ class ProductController extends Controller
             $data = Product::get();
 
             foreach ($data as $datum) {
-                if (Storage::url("images/product/$datum->id/$datum->image_uuid.png")) {
+                if (Storage::exists("images/product/$datum->id/$datum->image_uuid.png")) {
                     $datum->image = Storage::url("images/product/$datum->id/$datum->image_uuid.png");
                 }
                 // $data->image = Storage::url("images/product/1/f5210b76-022c-4ab9-aa3f-7de59f826367.png");
